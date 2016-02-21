@@ -1,0 +1,48 @@
+#!/usr/bin/env python -tt
+# -*- coding: utf-8 -*-
+# Author : Aditya Mukherjee
+
+from sys import argv
+from sys import exit
+import Queue as Q 
+
+class FileContextManager():
+    def __init__(self,file_name):
+        self._file_name = file_name
+        self._file = None
+
+    def __enter__(self):
+        self._file = open(self._file_name)
+        return self._file
+
+    def __exit__(self,cls, value, tb):
+        self._file.close()
+
+def accessfile(file_name):
+    """ Getting the input to feed the program here."""
+
+    rowsL= Q.PriorityQueue()
+
+    with FileContextManager(file_name) as file:
+        for i, line in enumerate(file.readlines()):
+            if i == 0:
+                limit = line
+                print "Limit: %s" % limit;
+            else:
+                rowsL.put( len(line), line)
+                if rowsL.qsize > 2:
+                    rowsL.get()
+
+    return rowsL
+
+def main():
+    if len(argv) != 2:
+        print "usage: ./longest_lines.py2 filename"
+        exit(1)
+
+    filename = argv[1]
+
+    accessfile(filename)
+
+if __name__ == '__main__':
+    main()
